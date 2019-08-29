@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/rootview"
+    android:background="@drawable/emoji"
+    tools:context=".Emojify">
+
+
+    <hani.momanii.supernova_emoji_library.Helper.EmojiconEditText
+        android:id="@+id/editText"
+        android:layout_width="300dp"
+        android:layout_marginTop="100dp"
+        android:maxLength="2"
+        android:layout_centerHorizontal="true"
+        android:layout_height="40dp"
+        android:background="@drawable/roundedittext"
+        android:inputType="textMultiLine|textShortMessage"
+        />
+
+    <ImageView
+        android:id="@+id/button"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@+id/editText"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="20dp"
+        android:src="@drawable/icon"
+        android:background="@drawable/roundborder"
+        android:text="@string/emojify" />
+
+
+</RelativeLayout>
