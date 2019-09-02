@@ -28,6 +28,7 @@ import org.jetbrains.annotations.NotNull;
 
 import hani.momanii.supernova_emoji_library.Actions.EmojIconActions;
 import hani.momanii.supernova_emoji_library.Helper.EmojiconEditText;
+import hani.momanii.supernova_emoji_library.Helper.EmojiconTextView;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -39,14 +40,16 @@ public class Emojify extends AppCompatActivity {
     public Call<Result> result;
     public View view;
     public EmojIconActions emojIcon;
-    public TextView emojiconEditText;
+    public EmojiconTextView emojiconEditText;
     public TextView emojiconEditText1;
     public CharSequence aaaa;
     public String aa;
     public Result r;
+    public Result m;
     private ImageView image;
+    public String a;
     private EmojiconEditText editText;
-
+    public ImageView imageView;
     @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,7 +72,7 @@ public class Emojify extends AppCompatActivity {
         };
 
         editText.setOnTouchListener(otl);
-
+        editText.setEmojiconSize(80);
         emojIcon.setIconsIds(R.drawable.icon, R.drawable.icon);
         emojIcon.ShowEmojIcon();
         emojIcon.setKeyboardListener(new EmojIconActions.KeyboardListener() {
@@ -99,8 +102,14 @@ public class Emojify extends AppCompatActivity {
                     emojify(s);
 
                 } else {
+                    if(editText.getText() != null){
+                        close();
+                    }
+                    else{
+                        Toast.makeText(Emojify.this, "Please neter an emoji", Toast.LENGTH_SHORT).show();
 
-                    close();
+                    }
+
                 }
 
             }
@@ -163,21 +172,39 @@ public class Emojify extends AppCompatActivity {
 
     }
 
+    @SuppressLint("SetTextI18n")
     private void show(Result r) {
         final Dialog dialog = new Dialog(Emojify.this);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE); // before
         dialog.setContentView(R.layout.dialog);
 
+        assert r != null;
+        m=r;
         WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
         lp.copyFrom(dialog.getWindow().getAttributes());
         lp.width = WindowManager.LayoutParams.MATCH_PARENT;
         lp.height = WindowManager.LayoutParams.WRAP_CONTENT;
-        emojiconEditText = findViewById(R.id.emo);
-        emojiconEditText1 = findViewById(R.id.mean);
+        emojiconEditText = dialog.findViewById(R.id.emo);
+        emojiconEditText1 = dialog.findViewById(R.id.mean);
+        imageView = dialog.findViewById(R.id.img_close);
+
+        imageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+                editText.getText().clear();
 
 
-        emojiconEditText.setText(r.getA());
-        emojiconEditText.setText(r.getAns());
+            }
+        });
+
+
+
+        dialog.show();
+        dialog.getWindow().setAttributes(lp);
+        a = m.getA();
+        emojiconEditText.setText(aa);
+        emojiconEditText1.setText(""+r.getAns());
 
 
     }

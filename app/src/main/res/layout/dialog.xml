@@ -56,9 +56,10 @@
                 android:orientation="horizontal"
                 android:padding="@dimen/spacing_large">
 
-                <TextView
+                <hani.momanii.supernova_emoji_library.Helper.EmojiconTextView
                     android:layout_width="wrap_content"
                     android:id="@+id/emo"
+                    android:text="emoji"
                     android:layout_height="wrap_content"
                     android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
                     android:textStyle="normal" />
@@ -75,6 +76,7 @@
                     android:id="@+id/mean"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:text="one"
                     android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
                     android:textColor="@color/colorPrimary"
                     android:textStyle="bold" />
