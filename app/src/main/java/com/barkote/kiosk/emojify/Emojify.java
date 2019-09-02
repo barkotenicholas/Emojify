@@ -3,6 +3,7 @@ package com.barkote.kiosk.emojify;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.net.ConnectivityManager;
@@ -54,6 +55,7 @@ public class Emojify extends AppCompatActivity {
     public ImageView imageView;
     private ImageView image;
     private EmojiconEditText editText;
+    public    ProgressDialog progressDialog;
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
@@ -69,9 +71,10 @@ public class Emojify extends AppCompatActivity {
         networkCalls = Emo.getApiClient();
         r = new Result("ex", "ex");
 
-        progressBar = findViewById(R.id.progress);
         Sprite doubleBounce = new DoubleBounce();
         progressBar.setIndeterminateDrawable(doubleBounce);
+
+        setUpProgressDialog();
 
         emojIcon = new EmojIconActions(this, view, editText, image);
         View.OnTouchListener otl = new View.OnTouchListener() {
@@ -106,18 +109,20 @@ public class Emojify extends AppCompatActivity {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
 
-                if (isNetworkAvailable()) {
-                    progressBar.setVisibility(View.VISIBLE);
-                    emojify(s);
+
+                if (s.length() == 0) {
+                    Toast.makeText(Emojify.this, "Please enter an emoji", Toast.LENGTH_SHORT).show();
 
                 } else {
-                    if (editText.getText() != null) {
-                        close();
+                    if (isNetworkAvailable()) {
+                        progressDialog.show();
+                        emojify(s);
+
                     } else {
-                        Toast.makeText(Emojify.this, "Please enter an emoji", Toast.LENGTH_SHORT).show();
+                        close();
+
 
                     }
-
                 }
 
             }
@@ -128,6 +133,23 @@ public class Emojify extends AppCompatActivity {
             }
         });
 
+    }
+
+    private void setUpProgressDialog() {
+        progressDialog  = new ProgressDialog(Emojify.this);
+
+        // Set horizontal progress bar style.
+        progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+        // Set progress dialog icon.
+        progressDialog.setIcon(R.drawable.icon);
+        // Set progress dialog title.
+        progressDialog.setTitle("Waiting...");
+        // The maxima progress value.
+        progressDialog.setMax(100);
+        // Whether progress dialog can be canceled or not.
+        progressDialog.setCancelable(true);
+        // When user touch area outside progress dialog whether the progress dialog will be canceled or not.
+        progressDialog.setCanceledOnTouchOutside(false);
     }
 
     private void close() {
@@ -156,7 +178,7 @@ public class Emojify extends AppCompatActivity {
         result = Emojify.networkCalls.sendMessage(a);
 
 
-        result.clone().enqueue(new Callback<Result>() {
+        result.enqueue(new Callback<Result>() {
             @SuppressLint("WrongViewCast")
             @Override
             public void onResponse(@NotNull Call<Result> call, @NotNull Response<Result> response) {
@@ -165,8 +187,7 @@ public class Emojify extends AppCompatActivity {
 
                     assert r != null;
 
-
-                    show(r);
+                 show(r);
                 }
             }
 
@@ -182,7 +203,8 @@ public class Emojify extends AppCompatActivity {
     @SuppressLint("SetTextI18n")
     private void show(Result r) {
 
-        progressBar.setVisibility(View.INVISIBLE);
+
+
 
         final Dialog dialog = new Dialog(Emojify.this);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE); // before
@@ -210,15 +232,25 @@ public class Emojify extends AppCompatActivity {
 
 
         String ans = r.getAns();
+        if (ans.equals("")) {
 
-        String withoutFirstCharacter = ans.substring(2);
-        String withoutLastCharacter = withoutFirstCharacter.substring(0, withoutFirstCharacter.length() - 1);
+            Toast.makeText(Emojify.this, "please emter an emoji", Toast.LENGTH_SHORT).show();
 
-        dialog.show();
-        dialog.getWindow().setAttributes(lp);
-        a = m.getA();
-        emojiconEditText.setText(aa);
-        emojiconEditText1.setText(withoutLastCharacter);
+
+        } else {
+            String withoutFirstCharacter = ans.substring(2);
+            String withoutLastCharacter = withoutFirstCharacter.substring(0, withoutFirstCharacter.length() - 1);
+
+
+            dialog.show();
+            dialog.getWindow().setAttributes(lp);
+            a = m.getA();
+            emojiconEditText.setText(aa);
+            emojiconEditText1.setText(withoutLastCharacter);
+
+            progressDialog.dismiss();
+
+        }
 
 
     }
