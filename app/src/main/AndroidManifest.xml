@@ -17,7 +17,9 @@
         tools:targetApi="m"
         android:usesCleartextTraffic="true"
         tools:ignore="GoogleAppIndexingWarning">
-        <activity android:name=".Emojify"></activity>
+        <activity
+            android:name=".Emojify"
+            android:windowSoftInputMode="stateHidden" />
         <activity android:name=".Splash"
             android:theme="@style/Theme.AppCompat.NoActionBar"
             >

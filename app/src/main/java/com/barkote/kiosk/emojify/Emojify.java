@@ -16,6 +16,7 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -23,6 +24,8 @@ import com.barkote.kiosk.emojify.retrofit.Interface.NetworkCalls;
 import com.barkote.kiosk.emojify.retrofit.instance.Emo;
 import com.barkote.kiosk.emojify.retrofit.model.Emoji;
 import com.barkote.kiosk.emojify.retrofit.model.Result;
+import com.github.ybq.android.spinkit.sprite.Sprite;
+import com.github.ybq.android.spinkit.style.DoubleBounce;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -46,10 +49,12 @@ public class Emojify extends AppCompatActivity {
     public String aa;
     public Result r;
     public Result m;
-    private ImageView image;
     public String a;
-    private EmojiconEditText editText;
+    public ProgressBar progressBar;
     public ImageView imageView;
+    private ImageView image;
+    private EmojiconEditText editText;
+
     @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,6 +68,10 @@ public class Emojify extends AppCompatActivity {
 
         networkCalls = Emo.getApiClient();
         r = new Result("ex", "ex");
+
+        progressBar = findViewById(R.id.progress);
+        Sprite doubleBounce = new DoubleBounce();
+        progressBar.setIndeterminateDrawable(doubleBounce);
 
         emojIcon = new EmojIconActions(this, view, editText, image);
         View.OnTouchListener otl = new View.OnTouchListener() {
@@ -98,15 +107,14 @@ public class Emojify extends AppCompatActivity {
             public void onTextChanged(CharSequence s, int start, int before, int count) {
 
                 if (isNetworkAvailable()) {
-                    Toast.makeText(Emojify.this, "aa", Toast.LENGTH_SHORT).show();
+                    progressBar.setVisibility(View.VISIBLE);
                     emojify(s);
 
                 } else {
-                    if(editText.getText() != null){
+                    if (editText.getText() != null) {
                         close();
-                    }
-                    else{
-                        Toast.makeText(Emojify.this, "Please neter an emoji", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(Emojify.this, "Please enter an emoji", Toast.LENGTH_SHORT).show();
 
                     }
 
@@ -123,10 +131,12 @@ public class Emojify extends AppCompatActivity {
     }
 
     private void close() {
+        editText.getText().clear();
+        emojIcon.closeEmojIcon();
         final AlertDialog alertDialog = new AlertDialog.Builder(Emojify.this).create();
         alertDialog.setTitle("Info");
         alertDialog.setMessage("Internet not available, Cross check your internet connectivity and try again");
-        alertDialog.setIcon(android.R.drawable.ic_dialog_alert);
+        alertDialog.setIcon(R.drawable.frown);
         alertDialog.setButton("OK", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
                 alertDialog.cancel();
@@ -137,12 +147,10 @@ public class Emojify extends AppCompatActivity {
     }
 
     private void emojify(CharSequence s) {
-        Toast.makeText(Emojify.this, "nn", Toast.LENGTH_SHORT).show();
         aaaa = s;
         aa = " " + s;
         r.setA(aa);
 
-        Toast.makeText(Emojify.this, "ss" + aa, Toast.LENGTH_SHORT).show();
         final Emoji a = new Emoji(aa);
 
         result = Emojify.networkCalls.sendMessage(a);
@@ -157,7 +165,6 @@ public class Emojify extends AppCompatActivity {
 
                     assert r != null;
 
-                    Toast.makeText(Emojify.this, "zz" + r.getAns(), Toast.LENGTH_SHORT).show();
 
                     show(r);
                 }
@@ -174,12 +181,15 @@ public class Emojify extends AppCompatActivity {
 
     @SuppressLint("SetTextI18n")
     private void show(Result r) {
+
+        progressBar.setVisibility(View.INVISIBLE);
+
         final Dialog dialog = new Dialog(Emojify.this);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE); // before
         dialog.setContentView(R.layout.dialog);
 
         assert r != null;
-        m=r;
+        m = r;
         WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
         lp.copyFrom(dialog.getWindow().getAttributes());
         lp.width = WindowManager.LayoutParams.MATCH_PARENT;
@@ -199,12 +209,16 @@ public class Emojify extends AppCompatActivity {
         });
 
 
+        String ans = r.getAns();
+
+        String withoutFirstCharacter = ans.substring(2);
+        String withoutLastCharacter = withoutFirstCharacter.substring(0, withoutFirstCharacter.length() - 1);
 
         dialog.show();
         dialog.getWindow().setAttributes(lp);
         a = m.getA();
         emojiconEditText.setText(aa);
-        emojiconEditText1.setText(""+r.getAns());
+        emojiconEditText1.setText(withoutLastCharacter);
 
 
     }
