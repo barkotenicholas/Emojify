@@ -17,9 +17,12 @@
         tools:targetApi="m"
         android:usesCleartextTraffic="true"
         tools:ignore="GoogleAppIndexingWarning">
+
+
         <activity
             android:name=".Emojify"
-            android:windowSoftInputMode="stateHidden" />
+            android:windowSoftInputMode="stateHidden"
+            android:screenOrientation="portrait" />
         <activity android:name=".Splash"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar.FullScreen"
             >

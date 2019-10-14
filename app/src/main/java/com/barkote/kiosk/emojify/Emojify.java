@@ -6,6 +6,7 @@ import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.pm.ActivityInfo;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
@@ -25,8 +26,13 @@ import com.barkote.kiosk.emojify.retrofit.Interface.NetworkCalls;
 import com.barkote.kiosk.emojify.retrofit.instance.Emo;
 import com.barkote.kiosk.emojify.retrofit.model.Emoji;
 import com.barkote.kiosk.emojify.retrofit.model.Result;
-import com.github.ybq.android.spinkit.sprite.Sprite;
-import com.github.ybq.android.spinkit.style.DoubleBounce;
+import com.getkeepsafe.taptargetview.TapTarget;
+import com.getkeepsafe.taptargetview.TapTargetSequence;
+import com.google.android.gms.ads.AdListener;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.InterstitialAd;
+import com.google.android.gms.ads.MobileAds;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -37,9 +43,11 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import static com.barkote.kiosk.emojify.R.id.button;
+
 public class Emojify extends AppCompatActivity {
 
-
+    private InterstitialAd mInterstitialAd;
     public static NetworkCalls networkCalls;
     public Call<Result> result;
     public View view;
@@ -53,35 +61,61 @@ public class Emojify extends AppCompatActivity {
     public String a;
     public ProgressBar progressBar;
     public ImageView imageView;
+    public ProgressDialog progressDialog;
     private ImageView image;
     private EmojiconEditText editText;
-    public    ProgressDialog progressDialog;
+    private AdView mAdView;
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         setContentView(R.layout.activity_emojify);
 
-
         view = findViewById(R.id.rootview);
-        image = findViewById(R.id.button);
+        image = findViewById(button);
         editText = findViewById(R.id.editText);
-
         networkCalls = Emo.getApiClient();
         r = new Result("ex", "ex");
 
-        Sprite doubleBounce = new DoubleBounce();
-        progressBar.setIndeterminateDrawable(doubleBounce);
-
+       /* mAdView =  findViewById(R.id.adView);
+        AdRequest adRequest = new AdRequest.Builder()
+                .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
+                .build();
+        mAdView.loadAd(adRequest);*/
         setUpProgressDialog();
-
         emojIcon = new EmojIconActions(this, view, editText, image);
         View.OnTouchListener otl = new View.OnTouchListener() {
             public boolean onTouch(View v, MotionEvent event) {
                 return true; // the listener has consumed the event
             }
         };
+        new TapTargetSequence(Emojify.this)
+                .targets(
+
+
+                        TapTarget.forView(findViewById(button), "Click", "click here to choose your emoji").cancelable(true)
+
+                ).listener(new TapTargetSequence.Listener() {
+            // This listener will tell us when interesting(tm) events happen in regards
+            // to the sequence
+            @Override
+            public void onSequenceFinish() {
+
+            }
+
+            @Override
+            public void onSequenceStep(TapTarget lastTarget, boolean targetClicked) {
+
+            }
+
+            @Override
+            public void onSequenceCanceled(TapTarget lastTarget) {
+                // Boo
+            }
+        }).start();
+
 
         editText.setOnTouchListener(otl);
         editText.setEmojiconSize(80);
@@ -136,18 +170,17 @@ public class Emojify extends AppCompatActivity {
     }
 
     private void setUpProgressDialog() {
-        progressDialog  = new ProgressDialog(Emojify.this);
+        progressDialog = new ProgressDialog(Emojify.this);
 
         // Set horizontal progress bar style.
-        progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+        progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         // Set progress dialog icon.
         progressDialog.setIcon(R.drawable.icon);
         // Set progress dialog title.
         progressDialog.setTitle("Waiting...");
         // The maxima progress value.
-        progressDialog.setMax(100);
         // Whether progress dialog can be canceled or not.
-        progressDialog.setCancelable(true);
+        progressDialog.setCancelable(false);
         // When user touch area outside progress dialog whether the progress dialog will be canceled or not.
         progressDialog.setCanceledOnTouchOutside(false);
     }
@@ -187,7 +220,7 @@ public class Emojify extends AppCompatActivity {
 
                     assert r != null;
 
-                 show(r);
+                    show(r);
                 }
             }
 
@@ -200,10 +233,13 @@ public class Emojify extends AppCompatActivity {
 
     }
 
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+    }
+
     @SuppressLint("SetTextI18n")
     private void show(Result r) {
-
-
 
 
         final Dialog dialog = new Dialog(Emojify.this);
@@ -225,7 +261,7 @@ public class Emojify extends AppCompatActivity {
             public void onClick(View v) {
                 dialog.dismiss();
                 editText.getText().clear();
-
+                loadInterstitialAd();
 
             }
         });
@@ -247,7 +283,7 @@ public class Emojify extends AppCompatActivity {
             a = m.getA();
             emojiconEditText.setText(aa);
             emojiconEditText1.setText(withoutLastCharacter);
-
+            loadInterstitialAd();
             progressDialog.dismiss();
 
         }
@@ -263,4 +299,29 @@ public class Emojify extends AppCompatActivity {
         return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
 
+    private void loadInterstitialAd() {
+        mInterstitialAd = new InterstitialAd(this);
+        mInterstitialAd.setAdUnitId("ca-app-pub-3940256099942544/1033173712");
+        mInterstitialAd.setAdListener(new AdListener() {
+
+            @Override
+            public void onAdLoaded() {
+                super.onAdLoaded();
+                Toast.makeText(Emojify.this, "onAdLoaded()", Toast.LENGTH_SHORT).show();
+                if (mInterstitialAd.isLoaded()) {
+                    mInterstitialAd.show();
+                }
+            }
+
+            @Override
+            public void onAdFailedToLoad(int i) {
+                super.onAdFailedToLoad(i);
+                Toast.makeText(Emojify.this, "onAdFailedToLoad()" +i, Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        AdRequest adRequest = new AdRequest.Builder().build();
+        mInterstitialAd.loadAd(adRequest);
+
+    }
 }
