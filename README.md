@@ -13,10 +13,12 @@
 
 ---
 ## preview
-![ScreenShot](screenshots/a.jpg)
-![ScreenShot](screenshots/b.jpg)
-![ScreenShot](screenshots/c.jpg)
-![ScreenShot](screenshots/d.jpg)
+<img src="screenshots/a.jpg" alt="drawing" width="200"/>
+<img src="screenshots/b.jpg" alt="drawing" width="200"/>
+<img src="screenshots/c.jpg" alt="drawing" width="200"/>
+<img src="screenshots/d.jpg" alt="drawing" width="200"/>
+
+
 
 ---
 
