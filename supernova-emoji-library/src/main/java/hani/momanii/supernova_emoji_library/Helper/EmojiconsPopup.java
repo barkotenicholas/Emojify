@@ -23,10 +23,7 @@ import android.graphics.Rect;
 import android.os.Build;
 import android.os.Handler;
 import android.os.SystemClock;
-import android.support.v4.view.PagerAdapter;
-import android.support.v4.view.ViewPager;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -39,6 +36,10 @@ import android.view.WindowManager.LayoutParams;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
+
+import androidx.viewpager.widget.PagerAdapter;
+import androidx.viewpager.widget.ViewPager;
+
 import java.util.Arrays;
 import java.util.List;
 

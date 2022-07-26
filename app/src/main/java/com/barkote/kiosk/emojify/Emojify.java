@@ -1,5 +1,7 @@
 package com.barkote.kiosk.emojify;
 
+import static com.barkote.kiosk.emojify.R.id.button;
+
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -10,7 +12,6 @@ import android.content.pm.ActivityInfo;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.MotionEvent;
@@ -22,17 +23,12 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.barkote.kiosk.emojify.retrofit.Interface.NetworkCalls;
 import com.barkote.kiosk.emojify.retrofit.instance.Emo;
 import com.barkote.kiosk.emojify.retrofit.model.Emoji;
 import com.barkote.kiosk.emojify.retrofit.model.Result;
-import com.getkeepsafe.taptargetview.TapTarget;
-import com.getkeepsafe.taptargetview.TapTargetSequence;
-import com.google.android.gms.ads.AdListener;
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdView;
-import com.google.android.gms.ads.InterstitialAd;
-import com.google.android.gms.ads.MobileAds;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -43,11 +39,8 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-import static com.barkote.kiosk.emojify.R.id.button;
-
 public class Emojify extends AppCompatActivity {
 
-    private InterstitialAd mInterstitialAd;
     public static NetworkCalls networkCalls;
     public Call<Result> result;
     public View view;
@@ -64,7 +57,6 @@ public class Emojify extends AppCompatActivity {
     public ProgressDialog progressDialog;
     private ImageView image;
     private EmojiconEditText editText;
-    private AdView mAdView;
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
@@ -91,30 +83,7 @@ public class Emojify extends AppCompatActivity {
                 return true; // the listener has consumed the event
             }
         };
-        new TapTargetSequence(Emojify.this)
-                .targets(
 
-
-                        TapTarget.forView(findViewById(button), "Click", "click here to choose your emoji").cancelable(true)
-
-                ).listener(new TapTargetSequence.Listener() {
-            // This listener will tell us when interesting(tm) events happen in regards
-            // to the sequence
-            @Override
-            public void onSequenceFinish() {
-
-            }
-
-            @Override
-            public void onSequenceStep(TapTarget lastTarget, boolean targetClicked) {
-
-            }
-
-            @Override
-            public void onSequenceCanceled(TapTarget lastTarget) {
-                // Boo
-            }
-        }).start();
 
 
         editText.setOnTouchListener(otl);
@@ -261,7 +230,6 @@ public class Emojify extends AppCompatActivity {
             public void onClick(View v) {
                 dialog.dismiss();
                 editText.getText().clear();
-                loadInterstitialAd();
 
             }
         });
@@ -283,7 +251,6 @@ public class Emojify extends AppCompatActivity {
             a = m.getA();
             emojiconEditText.setText(aa);
             emojiconEditText1.setText(withoutLastCharacter);
-            loadInterstitialAd();
             progressDialog.dismiss();
 
         }
@@ -299,29 +266,4 @@ public class Emojify extends AppCompatActivity {
         return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
 
-    private void loadInterstitialAd() {
-        mInterstitialAd = new InterstitialAd(this);
-        mInterstitialAd.setAdUnitId("ca-app-pub-3940256099942544/1033173712");
-        mInterstitialAd.setAdListener(new AdListener() {
-
-            @Override
-            public void onAdLoaded() {
-                super.onAdLoaded();
-                Toast.makeText(Emojify.this, "onAdLoaded()", Toast.LENGTH_SHORT).show();
-                if (mInterstitialAd.isLoaded()) {
-                    mInterstitialAd.show();
-                }
-            }
-
-            @Override
-            public void onAdFailedToLoad(int i) {
-                super.onAdFailedToLoad(i);
-                Toast.makeText(Emojify.this, "onAdFailedToLoad()" +i, Toast.LENGTH_SHORT).show();
-            }
-        });
-
-        AdRequest adRequest = new AdRequest.Builder().build();
-        mInterstitialAd.loadAd(adRequest);
-
-    }
 }
